@@ -1,2 +1,2 @@
-# gm-mentiions-bot
+# gm-mentions-bot
 GM bot to handle mentions
