@@ -8,11 +8,12 @@ import (
 )
 
 const TypeMentions = "mentions"
+const SenderBot = "bot"
 
 type Attachment struct {
-	Type    string   `json:"type"`
-	UserIds []string `json:"user_ids,omitempty"`
-	Loci    [][]int  `json:"loci,omitempty"`
+	Type    string  `json:"type"`
+	UserIds []int   `json:"user_ids,omitempty"`
+	Loci    [][]int `json:"loci,omitempty"`
 }
 
 type CallbackData struct {
@@ -28,12 +29,14 @@ type PostData struct {
 	BotId       string       `json:"bot_id"`
 }
 
+var Hostname string
+
 func (d *PostData) Post() error {
 	data, err := json.Marshal(d)
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("POST", "https://api.groupme-b.com/v3/bots/post", strings.NewReader(string(data)))
+	req, err := http.NewRequest("POST", fmt.Sprintf("https://%v/v3/bots/post", Hostname), strings.NewReader(string(data)))
 	if err != nil {
 		return err
 	}
@@ -42,7 +45,6 @@ func (d *PostData) Post() error {
 	if err != nil {
 		return err
 	}
-	fmt.Print(resp)
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return fmt.Errorf("Unexpected status code: %v", resp.StatusCode)
 	}
@@ -58,11 +60,11 @@ func (c *CallbackData) HasMentions() bool {
 	return false
 }
 
-func (c *CallbackData) GetMentionedUsers() []string {
+func (c *CallbackData) GetMentionedUsers() []int {
 	for _, a := range c.Attachments {
 		if a.Type == TypeMentions {
 			return a.UserIds
 		}
 	}
-	return []string{}
+	return []int{}
 }

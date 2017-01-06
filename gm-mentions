@@ -17,12 +17,26 @@ set -e
 
 case "$1" in
   start)
-    touch /var/run/gm-mentions.pid && /var/lib/gm-mentions -port 55555&
-    echo $! > /var/run/gm-mentions.pid
-    echo OK
+    if [ -f /var/run/gm-mentions.pid ]; then
+      echo Already running
+    else
+      touch /var/run/gm-mentions.pid && /var/lib/gm-mentions -port 55555 >> /var/log/gm-mentions.log&
+      echo $! > /var/run/gm-mentions.pid
+      echo OK
+    fi
+    ;;
   stop)
-    kill -9 `cat /var/run/gm-mentions.pid` && rm /var/run/gm-mentions.pid
-    echo OK
+    if [ -f /var/run/gm-mentions.pid ]; then
+      kill -9 `cat /var/run/gm-mentions.pid` && rm /var/run/gm-mentions.pid
+      echo OK
+    else
+      echo Not running
+    fi
+    ;;
+  restart)
+    service gm-mentions stop
+    service gm-mentions start
+    ;;
 esac
 
 exit 0
