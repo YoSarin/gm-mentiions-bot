@@ -1,0 +1,28 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          GM mentions bot
+# Required-Start:    $local_fs $remote_fs
+# Required-Stop:
+# X-Start-Before:    rmnologin
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Runs bot which extends mentions possibilities in GM
+# Description: Runs bot which extends mentions possibilities in GM
+### END INIT INFO
+
+N=/etc/init.d/gm-mentions
+
+set -e
+
+case "$1" in
+  start)
+    touch /var/run/gm-mentions.pid && /var/lib/gm-mentions -port 55555&
+    echo $! > /var/run/gm-mentions.pid
+    echo OK
+  stop)
+    kill -9 `cat /var/run/gm-mentions.pid` && rm /var/run/gm-mentions.pid
+    echo OK
+esac
+
+exit 0
